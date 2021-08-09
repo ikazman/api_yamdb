@@ -5,7 +5,7 @@ from database.models import Category
 from django.core.management import BaseCommand
 
 
-TABLES_DICT = {Category: 'category.csv',}
+TABLES_DICT = {Category: 'category.csv', }
 
 
 class Command(BaseCommand):
@@ -21,6 +21,7 @@ class Command(BaseCommand):
             with open(filename, 'r') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    data = dict((key.lower(), value) for key, value in row.items())
+                    data = dict((key.lower(), value) for
+                                key, value in row.items())
                     model_instance = table(**data)
                     model_instance.save()
