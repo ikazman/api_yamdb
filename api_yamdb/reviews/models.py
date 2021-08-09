@@ -7,7 +7,7 @@ User = get_user_model()
 # ▼▼▼
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = 
+    year =
     category = models.ForeignKey('Category', related_name='comments')  
 
     def __str__(self):
