@@ -127,3 +127,18 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+DEFAULT_FROM_EMAIL = "from@example.com"
+#  подключаем движок filebased.EmailBackend
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+# указываем директорию, в которую будут складываться файлы писем
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")

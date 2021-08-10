@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -16,9 +18,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True)
     email = models.EmailField()
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=USER)
-    bio = models.TextField(
-        'Биография',
-        blank=True,
-    )
+    bio = models.TextField(blank=True)
     first_name = models.CharField(max_length=20, blank=True, null=True)
     last_name = models.CharField(max_length=20, blank=True, null=True)
+    confirmation_code = models.UUIDField(default=uuid.uuid4, editable=False)
