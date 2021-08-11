@@ -4,7 +4,7 @@ from django.db import models
 
 from datetime import datetime
 
-User = get_user_model()
+# User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(
