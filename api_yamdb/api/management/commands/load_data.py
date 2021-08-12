@@ -7,8 +7,8 @@ from django.core.management import BaseCommand
 
 TABLES_DICT = {
     Category: 'category.csv',
-    Comment: 'comments.csv',
     Review: 'review.csv',
+    Comment: 'comments.csv',
 }
 
 

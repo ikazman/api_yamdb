@@ -10,6 +10,7 @@ class OwnerOrReadOnly(permissions.BasePermission):
 
 
 class Moderator(permissions.BasePermission):
+    message = "Изменение чужого контента разрешено!"
 
     def has_object_permission(self, request, view, obj):
         return (request.method in permissions.SAFE_METHODS
