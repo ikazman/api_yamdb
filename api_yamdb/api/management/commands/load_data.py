@@ -1,7 +1,7 @@
 import csv
 import os
 
-from database.models import Category, Comment, Review, Users
+from reviews.models import Category, Comment, Review
 from django.core.management import BaseCommand
 
 
@@ -9,7 +9,6 @@ TABLES_DICT = {
     Category: 'category.csv',
     Comment: 'comments.csv',
     Review: 'review.csv',
-    Users: 'users.csv',
 }
 
 

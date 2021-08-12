@@ -16,6 +16,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
+        exclude = ('review_id', )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,3 +38,4 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+        exclude = ('title_id', )
