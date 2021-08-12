@@ -7,19 +7,19 @@ from .views import (
 
 router = DefaultRouter()
 router.register(
-    r'v1/titles/(?P<title_id>\d+)/reviews',
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='reviews'
 )
 router.register(
-    r'v1/titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments', 
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comments'
 )
-router.register('v1/users', UserViewSet, basename='users')
+router.register('users', UserViewSet, basename='users')
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('v1/', include(router.urls)),
     path('v1/api-token-auth/', views.obtain_auth_token),
 ]

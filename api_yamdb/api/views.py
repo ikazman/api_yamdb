@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from reviews.models import Review, User
+from reviews.models import Review, User, Titles
 from rest_framework import viewsets
 
 from .permissions import OwnerOrReadOnly, Moderator
@@ -14,11 +14,16 @@ from .serializers import CommentSerializer, ReviewSerializer, UserSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [OwnerOrReadOnly]
 
+    def get_queryset(self):
+        title = get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
+        reviews = title.reviews.all()
+        return reviews
+
     def perform_create(self, serializer):
+        get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
         serializer.save(author=self.request.user)
 
     def get_permissions(self, request):
@@ -39,14 +44,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         return comments
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
-        serializer.save(author=self.request.user, review=review)
+        get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        serializer.save(author=self.request.user)
 
     def get_permissions(self, request):
         # Если человек модератор то может все менять
         if request.user == 'moderator':
             return (Moderator(),)
-        # Для остальных ситуаций оставим текущий перечень пермишенов без изменений
+        # Для остальных ситуаций
+        # оставим текущий перечень пермишенов без изменений
         return super().get_permissions()
 
 
