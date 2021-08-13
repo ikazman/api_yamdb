@@ -29,7 +29,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         user = self.request.user
         serializer = self.get_serializer(user)
-        
+
         if request.method == 'PATCH':
             serializer = self.get_serializer(user,
                                              data=request.data,
@@ -50,12 +50,10 @@ class SignupViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
+
         if User.objects.filter(username=username).exists():
             user = User.objects.get(username=username, email=email)
             self.sent_code(user, email)
-            return Response({'email': email,
-                             'username': username},
-                            status=status.HTTP_200_OK)
         user = User.objects.create(username=username,
                                    email=email)
         self.sent_code(user, email)

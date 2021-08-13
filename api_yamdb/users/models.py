@@ -19,4 +19,4 @@ class User(AbstractUser):
     bio = models.TextField(blank=True)
     first_name = models.CharField(max_length=20, blank=True, null=True)
     last_name = models.CharField(max_length=20, blank=True, null=True)
-    password = None
+    password = ''
