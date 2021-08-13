@@ -3,10 +3,10 @@ from rest_framework.routers import DefaultRouter
 
 from .views import SignupViewSet, TokenViewSet, UserViewSet
 
-router = DefaultRouter()
+router_v1 = DefaultRouter()
 
 
-router.register(r'users', UserViewSet)
+router_v1.register(r'users', UserViewSet)
 
 auth_patterns = [
     path('signup/', SignupViewSet.as_view({'post': 'signup'})),
@@ -15,5 +15,5 @@ auth_patterns = [
 
 urlpatterns = [
     path('v1/auth/', include(auth_patterns)),
-    path('v1/', include(router.urls)),
+    path('v1/', include(router_v1.urls)),
 ]

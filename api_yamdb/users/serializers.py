@@ -5,18 +5,27 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        exclude = ('confirmation_code',)
+        fields = '__all__'
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     def validate_username(self, value):
         if value.lower() == 'me':
             raise serializers.ValidationError('"me" not allowed as username')
         return value
+
+    def validate_email(self, email):
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Email not unique')
+        return email
 
     class Meta:
         model = User
