@@ -61,10 +61,10 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         verbose_name='Год',
         help_text='Введите год',
-        validators=[
+        validators=(
             MinValueValidator(0),
             MaxValueValidator(datetime.now().year)
-        ],
+        ),
         db_index=True
     )
     category = models.ForeignKey(

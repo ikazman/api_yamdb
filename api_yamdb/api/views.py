@@ -12,16 +12,21 @@ from .serializers import (
 )
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    permission_classes = (IsAuthenticated,)
+class TitleViewSet(viewsets.ModelViewSet):
+    serializer_class = TitlePostSerializer
+    queryset = Title.objects.annotate(rating=Avg(
+        'reviews__score')).order_by('-id')
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrReadOnly,
+    ]
     filter_backends = [DjangoFilterBackend]
-    filterset_class = TitleFilter
+    filter_backends = (filters.SearchFilter,)
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return TitleListSerializer
-        return TitlePostSerializer
+        if self.request.method in ['POST', 'PATCH']:
+            return TitlePostSerializer
+        return TitleListSerializer
 
 
 class CategoryViewSet(ListModelMixin,
