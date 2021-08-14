@@ -3,8 +3,9 @@ import os
 
 from django.core.management import BaseCommand
 
-from reviews.models import Category
+from reviews.models import Category, Comment, Review
 from users.models import User
+
 
 TABLES_DICT = {User: 'users.csv',
                Category: 'category.csv', }
