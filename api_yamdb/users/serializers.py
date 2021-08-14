@@ -1,12 +1,9 @@
 from rest_framework import serializers
 
-
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -24,12 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         if value.lower() == 'me':
             raise serializers.ValidationError('"me" not allowed as username')
         return value
-
-    def validate_unique(self, data):
-        email = self.context.get('email')
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError('"me" not allowed as username')
-        return data
 
     class Meta:
         model = User
