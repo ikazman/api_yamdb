@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404
-from reviews.models import Review, User, Titles
+from reviews.models import Review, User, Title
 from rest_framework import viewsets
 
 from .permissions import OwnerOrReadOnly, Moderator
 
 
-from .serializers import CommentSerializer, ReviewSerializer, UserSerializer
+from .serializers import CommentSerializer, ReviewSerializer
 
 
 #  на уровне проекта доступ есть только у админа,
@@ -18,12 +18,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [OwnerOrReadOnly]
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
-        reviews = title.reviews.all()
-        return reviews
+        title = get_object_or_404(Title, pk=self.kwargs.get("title"))
+        return title.reviews.all()
 
     def perform_create(self, serializer):
-        get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
+        get_object_or_404(Title, pk=self.kwargs.get("title"))
         serializer.save(author=self.request.user)
 
     def get_permissions(self, request):
@@ -39,12 +38,12 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [OwnerOrReadOnly]
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        review = get_object_or_404(Review, pk=self.kwargs.get("review"))
         comments = review.comments.all()
         return comments
 
     def perform_create(self, serializer):
-        get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        get_object_or_404(Review, pk=self.kwargs.get("review"))
         serializer.save(author=self.request.user)
 
     def get_permissions(self, request):
@@ -54,9 +53,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         # Для остальных ситуаций
         # оставим текущий перечень пермишенов без изменений
         return super().get_permissions()
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [OwnerOrReadOnly]

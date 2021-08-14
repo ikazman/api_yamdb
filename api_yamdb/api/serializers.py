@@ -8,21 +8,15 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
-    review_id = serializers.HyperlinkedRelatedField(
-        view_name='review_id',
+    review = serializers.HyperlinkedRelatedField(
+        view_name='review',
         read_only=True
     )
 
     class Meta:
         fields = '__all__'
         model = Comment
-        exclude = ('review_id', )
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = '__all__'
-        model = User
+        # exclude = ('review', )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -30,15 +24,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
-    title_id = serializers.SlugRelatedField(
+    title = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='title_id'
+        slug_field='title'
     )
 
     class Meta:
         model = Review
         fields = '__all__'
-        exclude = ('title_id', )
+        exclude = ('title', )
         validators = [
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),

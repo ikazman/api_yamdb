@@ -2,8 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-User = get_user_model()
+from users.models import User
 
 
 class Category(models.Model):
@@ -17,14 +16,14 @@ class Category(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     pass
 
 
 class Review(models.Model):
     text = models.TextField()
-    title_id = models.ForeignKey(
-        Titles,
+    title = models.ForeignKey(
+        Title,
         on_delete=models.CASCADE,
         related_name="reviews",
         verbose_name="Номер произведения"
@@ -46,7 +45,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     text = models.TextField()
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name="comments",
