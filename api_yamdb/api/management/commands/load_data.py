@@ -1,13 +1,19 @@
 import csv
 import os
 
+from reviews.models import Category, Comment, Review
+
 from django.core.management import BaseCommand
 
 from reviews.models import Category
 from users.models import User
 
+
 TABLES_DICT = {User: 'users.csv',
-               Category: 'category.csv', }
+               Category: 'category.csv',
+               Review: 'review.csv',
+               Comment: 'comments.csv',
+               }
 
 FIELDS_WITH_ID = {'review_id': 'review',
                   'title_id': 'title',
