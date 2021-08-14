@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
-from reviews.models import Category, Genre, Title
+from rest_framework.validators import UniqueTogetherValidator
+from reviews.models import Comment, Review, User, Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -37,3 +37,48 @@ class TitleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'genre', 'category',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+    review = serializers.HyperlinkedRelatedField(
+        view_name='review',
+        read_only=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        exclude = ('review_id',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = User
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+    title = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='title'
+    )
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+        exclude = ('title_id',)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('title_id', 'author'),
+                message="Возможен только один отзыв!"
+            )
+        ]
