@@ -1,11 +1,17 @@
 import csv
 import os
 
-from database.models import Category
 from django.core.management import BaseCommand
 
+from reviews.models import Category
+from users.models import User
 
-TABLES_DICT = {Category: 'category.csv', }
+TABLES_DICT = {User: 'users.csv',
+               Category: 'category.csv', }
+
+FIELDS_WITH_ID = {'review_id': 'review',
+                  'title_id': 'title',
+                  'genre_id': 'genre'}
 
 
 class Command(BaseCommand):
@@ -18,10 +24,14 @@ class Command(BaseCommand):
         path = kwargs['path']
         for table, file in TABLES_DICT.items():
             filename = os.path.join(path, file)
-            with open(filename, 'r') as file:
+            with open(filename, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     data = dict((key.lower(), value) for
                                 key, value in row.items())
+                    for key, value in data.items():
+                        if key in FIELDS_WITH_ID:
+                            key = FIELDS_WITH_ID[key]
+                            data[key] = value
                     model_instance = table(**data)
                     model_instance.save()

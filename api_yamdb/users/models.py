@@ -3,7 +3,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -13,12 +12,12 @@ class User(AbstractUser):
         (ADMIN, 'admin'),
     )
 
-    username = models.CharField(max_length=20, unique=True)
-    email = models.EmailField()
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=USER)
-    bio = models.TextField(
-        'Биография',
-        blank=True,
-    )
+    bio = models.TextField(blank=True)
+    email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=20, blank=True, null=True)
     last_name = models.CharField(max_length=20, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=USER)
+    username = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        ordering = ['username']
