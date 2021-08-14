@@ -1,11 +1,14 @@
 import csv
 import os
 
+<<<<<<< HEAD
 from reviews.models import Category, Comment, Review
 
+=======
+>>>>>>> user-app
 from django.core.management import BaseCommand
 
-from reviews.models import Category
+from reviews.models import Category, Comment, Review
 from users.models import User
 
 
