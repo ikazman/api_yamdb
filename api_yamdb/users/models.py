@@ -21,7 +21,3 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['username']
-
-
-
-
