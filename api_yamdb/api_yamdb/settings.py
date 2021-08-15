@@ -149,4 +149,4 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),}
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365), }
