@@ -42,7 +42,7 @@ python3 manage.py makemigrations
 ```
 python3 manage.py migrate
 ```
-Запустить базу данных из csv:
+Заполнить базу данных из csv:
 
 ```
 python3 manage.py load_data --path static/data
