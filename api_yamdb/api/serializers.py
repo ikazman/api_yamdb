@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-from reviews.models import Comment, Review, User, Category, Genre, Title
+
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -26,67 +26,51 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'genre', 'category',)
+        fields = (
+            'id', 'name', 'year', 'description', 'genre', 'category'
+        )
 
 
 class TitleListSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
-    category = CategorySerializer()
-    rating = serializers.IntegerField()
+    genre = GenreSerializer(read_only=True, many=True)
+    category = CategorySerializer(read_only=True)
+    rating = serializers.IntegerField(read_only=True, required=False)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'genre', 'category',)
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
+        default=serializers.CurrentUserDefault(),
         read_only=True,
         slug_field='username'
     )
-    review = serializers.HyperlinkedRelatedField(
-        view_name='review',
+    review = serializers.SlugRelatedField(
+        slug_field='text',
         read_only=True
     )
 
     class Meta:
-        fields = '__all__'
         model = Comment
-<<<<<<< HEAD
-        # exclude = ('review', )
-=======
-        exclude = ('review_id',)
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
         fields = '__all__'
-        model = User
->>>>>>> user-app
+        read_only_fields = ('author', 'review')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
+        default=serializers.CurrentUserDefault(),
         read_only=True,
         slug_field='username'
     )
     title = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='title'
+        slug_field='name', required=False
     )
 
     class Meta:
         model = Review
         fields = '__all__'
-<<<<<<< HEAD
-        exclude = ('title', )
-=======
-        exclude = ('title_id',)
->>>>>>> user-app
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('title_id', 'author'),
-                message="Возможен только один отзыв!"
-            )
-        ]
