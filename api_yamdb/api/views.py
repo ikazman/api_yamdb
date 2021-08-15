@@ -1,96 +1,58 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from reviews.models import Review, Title
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import OwnerOrReadOnly, Moderator
-from .serializers import (CommentSerializer,
-                          ReviewSerializer,
-                          CategorySerializer,
-                          GenreSerializer,
-                          TitleListSerializer,
-                          TitlePostSerializer)
+from .filters import TitleFilter
+from reviews.models import Category, Genre, Title
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitlePostSerializer,
+    TitleViewSerializer)
 
 
-#  на уровне проекта доступ есть только у админа,
-#  но на уровне представлений права переопределяем на
-#  возможность любому читать и собственнику - править.
+class CategoryViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    # permission_classes = метод безопасный (readonly) ИЛИ только АДМИНУ
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
 
-class TitlesViewSet(viewsets.ModelViewSet):
+
+class GenreViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    # permission_classes = метод безопасный (readonly) ИЛИ только АДМИНУ
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    permission_classes = (IsAuthenticated,)
-    filter_backends = [DjangoFilterBackend]
+    # permission_classes = метод безопасный (readonly) ИЛИ только АДМИНУ
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
-            return TitleListSerializer
+            return TitleViewSerializer
         return TitlePostSerializer
-
-
-class CategoryViewSet(ListModelMixin,
-                      CreateModelMixin,
-                      DestroyModelMixin,
-                      GenericViewSet):
-    queryset = Category.objects.all().order_by('id')
-    serializer_class = CategorySerializer
-    pagination_class = PageNumberPagination
-    permission_classes = (IsAdminOrReadOnly,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-
-
-class GenreViewSet(ListModelMixin,
-                   CreateModelMixin,
-                   DestroyModelMixin,
-                   GenericViewSet):
-    queryset = Genre.objects.all().order_by('id')
-    serializer_class = GenreSerializer
-    pagination_class = PageNumberPagination
-    permission_classes = (IsAdminOrReadOnly,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    serializer_class = ReviewSerializer
-    permission_classes = [OwnerOrReadOnly]
-
-    def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get("title"))
-        return title.reviews.all()
-
-    def perform_create(self, serializer):
-        get_object_or_404(Title, pk=self.kwargs.get("title"))
-        serializer.save(author=self.request.user)
-
-    def get_permissions(self, request):
-        # Если человек модератор то может все менять
-        if request.user == 'moderator':
-            return (Moderator(),)
-        # Для остальных ситуаций оставим текущий перечень пермишенов без изменений
-        return super().get_permissions()
-
-
-class CommentViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
-    permission_classes = [OwnerOrReadOnly]
-
-    def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review"))
-        comments = review.comments.all()
-        return comments
-
-    def perform_create(self, serializer):
-        get_object_or_404(Review, pk=self.kwargs.get("review"))
-        serializer.save(author=self.request.user)
-
-    def get_permissions(self, request):
-        # Если человек модератор то может все менять
-        if request.user == 'moderator':
-            return (Moderator(),)
-        # Для остальных ситуаций
-        # оставим текущий перечень пермишенов без изменений
-        return super().get_permissions()

@@ -1,31 +1,27 @@
-from django.contrib.auth import get_user_model
-from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
-
-from users.models import User
-
 from datetime import datetime
 
-# User = get_user_model()
+from django.core.validators import MaxValueValidator
+from django.db import models
+
 
 class Category(models.Model):
     name = models.CharField(
-        max_length=100,
-        verbose_name='Имя категории',
-        help_text='Введите имя категории'
+        max_length=50,
+        verbose_name='Название',
+        help_text='Введите название'
     )
     slug = models.SlugField(
         max_length=50,
         unique=True,
-        verbose_name='Ключевое слово',
-        help_text='Введите ключевое слово',
+        verbose_name='Тег',
+        help_text='Введите тег',
         db_index=True
     )
 
     class Meta:
-        ordering = ('name',)
-        verbose_name = 'Ключевое слово'
-        verbose_name_plural = 'Ключевые слова'
+        ordering = ('slug',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -33,15 +29,15 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        max_length=100,
-        verbose_name='Название',
-        help_text='Введите название'
+        max_length=50,
+        verbose_name='Жанр',
+        help_text='Введите Жанр'
     )
     slug = models.SlugField(
         max_length=50,
         unique=True,
-        verbose_name='Ключевое слово',
-        help_text='Введите ключевое слово',
+        verbose_name='Тег',
+        help_text='Введите тег',
         db_index=True
     )
 
@@ -54,34 +50,25 @@ class Genre(models.Model):
         return self.name
 
 
-class Title(models.Model):
+class Title(models.Model):    
     name = models.CharField(
-        verbose_name='Произведение',
-        help_text='Введите имя',
+        verbose_name='Название',
+        help_text='Введите название',
         max_length=100
-    )
+    )    
     year = models.PositiveSmallIntegerField(
         verbose_name='Год',
         help_text='Введите год',
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(datetime.now().year)
-        ],
+        validators=[MaxValueValidator(datetime.today().year)],
         db_index=True
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
-        related_name='title'
+        related_name='titles'
     )
-    genre = models.ManyToManyField(
-        Genre,
-        blank=True,
-        null=True,
-        related_name='title'
-    )
+    genre = models.ManyToManyField(Genre)
 
     class Meta:
         ordering = ('pk',)
@@ -90,53 +77,3 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Title(models.Model):
-    pass
-
-
-class Review(models.Model):
-    text = models.TextField()
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-        related_name="reviews",
-        verbose_name="Номер произведения"
-    )
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.PositiveIntegerField(
-        null=True,
-        verbose_name="Рейтинг",
-        validators=[MinValueValidator(1), MaxValueValidator(10)])
-
-    class Meta:
-        ordering = ["-pub_date"]
-
-    def __str__(self):
-        return self.text
-
-
-class Comment(models.Model):
-    text = models.TextField()
-    review = models.ForeignKey(
-        Review,
-        on_delete=models.CASCADE,
-        related_name="comments",
-        verbose_name="Номер отзыва"
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="comments",
-        verbose_name="Автор"
-    )
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-
-    class Meta:
-        ordering = ["-pub_date"]
-
-    def __str__(self):
-        return self.text
