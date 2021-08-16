@@ -75,7 +75,7 @@ class TokenViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
-        user = get_object_or_404(User, username=username) 
+        user = get_object_or_404(User, username=username)
         if default_token_generator.check_token(user, confirmation_code):
             refresh_token = RefreshToken.for_user(user)
             return Response({'token': str(refresh_token.access_token)})
