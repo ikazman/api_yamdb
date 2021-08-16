@@ -25,6 +25,7 @@ router_v1.register(
     views.GenreViewSet,
     basename='genre',
 )
+
 router_v1.register(
     'categories',
     views.CategoryViewSet,
