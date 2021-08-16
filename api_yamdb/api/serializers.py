@@ -1,3 +1,4 @@
+from django.core import exceptions
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -70,6 +71,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name', required=False
     )
+
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            title = self.context['view'].kwargs.get('title_id')
+            author = self.context['request'].user
+            if Review.objects.filter(title=title,
+                                     author=author).exists():
+                raise exceptions.ValidationError(
+                    'One review per title allowed')
+        return data
 
     class Meta:
         model = Review

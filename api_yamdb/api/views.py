@@ -43,21 +43,13 @@ class CategoryViewSet(CreateDestroyViewSet):
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
     permission_classes = [IsAdminOrReadOnly, ]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
-
-    @action(detail=False, methods=['delete'],
-            url_path=r'(?P<slug>\w+)')
-    def get_genre(self, request, slug):
-        genre = self.get_object()
-        serializer = serializers.GenreSerializer(genre)
-        genre.delete()
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -71,9 +63,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        if Review.objects.filter(title=title,
-                                 author=self.request.user).exists():
-            raise exceptions.ValidationError('One review per title allowed')
         serializer.save(author=self.request.user, title=title)
 
 
