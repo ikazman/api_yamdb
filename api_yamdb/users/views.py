@@ -47,8 +47,8 @@ class SignupViewSet(viewsets.ModelViewSet):
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
 
-        user, created = User.objects.get_or_create(username=username,
-                                                   email=email)
+        user, _ = User.objects.get_or_create(username=username,
+                                             email=email)
         self.send_code(user, email)
         return Response({'email': email,
                          'username': username},
